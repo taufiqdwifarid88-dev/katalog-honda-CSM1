@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricelist & Simulasi Kredit Resmi</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            DEFAULT: '#cc0000', // Honda Red
+                            hover: '#a30000',
+                            light: '#ffe5e5',
+                        },
+                        slate: {
+                            850: '#152033',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #f8fafc; } /* slate-50 */
+        html { scroll-behavior: smooth; }
+        
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; margin: 0; 
+        }
+        
+        /* Custom scrollbar for better desktop UX */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="antialiased text-gray-800 font-sans">
+
+    <!-- Navbar (Sticky) -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white shadow-md shadow-red-200">
+                        <i class="fa-solid fa-motorcycle text-xl"></i>
+                    </div>
+                    <span class="font-extrabold text-xl tracking-tight text-slate-800">Auto<span class="text-brand">Dealer</span></span>
+                </div>
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="#" class="text-sm font-semibold text-gray-600 hover:text-brand transition-colors">Katalog</a>
+                    <a href="#calculator-panel" class="text-sm font-semibold text-gray-600 hover:text-brand transition-colors">Simulasi</a>
+                    <a href="#wa" class="px-5 py-2.5 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-hover transition-colors shadow-sm shadow-red-200">Hubungi Kami</a>
+                </div>
+                <!-- Mobile menu button -->
+                <button class="md:hidden text-gray-500 hover:text-brand focus:outline-none">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Layout (Desktop 2-col, Mobile Stack) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+        
+        <!-- Left Column: Catalog (2/3 width on desktop) -->
+        <section class="w-full lg:w-2/3">
+            <div class="mb-8">
+                <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">Katalog Pricelist Terbaru</h1>
+                <p class="text-slate-500 mt-2 text-sm md:text-base">Pilih kendaraan impian Anda dan gunakan kalkulator untuk melihat estimasi angsuran bulanan.</p>
+            </div>
+            
+            <!-- Grid Katalog -->
+            <div id="catalogGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Cards injected by JS -->
+            </div>
+        </section>
+
+        <!-- Right Column: Sticky Calculator (1/3 width on desktop) -->
+        <aside id="calculator-panel" class="w-full lg:w-1/3 lg:sticky lg:top-24 scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 md:p-8 relative overflow-hidden">
+                
+                <!-- Decorative accent -->
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand to-red-400"></div>
+
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-brand"></i> Simulasi Kredit
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">Hitung angsuran Anda dalam hitungan detik.</p>
+                </div>
+
+                <div class="space-y-5">
+                    <!-- Dropdown Motor -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Unit Kendaraan</label>
+                        <div class="relative">
+                            <select id="inputMotor" class="w-full border-2 border-gray-200 rounded-xl p-3.5 pr-10 text-sm font-semibold text-slate-800 focus:border-brand focus:ring-0 outline-none appearance-none bg-white cursor-pointer transition-colors">
+                                <!-- Options injected by JS -->
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                <i class="fa-solid fa-chevron-down text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Harga OTR -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Harga OTR</span>
+                        <span id="displayOtr" class="text-base font-extrabold text-slate-800">Rp 0</span>
+                    </div>
+
+                    <!-- Input DP -->
+                    <div>
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Uang Muka (DP)</label>
+                            <span class="text-[10px] font-bold text-brand bg-brand-light px-2 py-0.5 rounded-full">Min. 10%</span>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3.5 text-sm font-extrabold text-slate-400">Rp</span>
+                            <input type="text" id="inputDp" class="w-full border-2 border-gray-200 rounded-xl py-3.5 pl-11 pr-4 text-base font-extrabold text-slate-800 focus:border-brand focus:ring-0 outline-none transition-colors" placeholder="Masukkan nominal DP">
+                        </div>
+                        <div id="dpWarning" class="hidden mt-2 flex items-center gap-1.5 text-xs font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-100">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span>DP minimal 10% dari OTR (<span id="minDpDisplay">Rp 0</span>)</span>
+                        </div>
+                    </div>
+
+                    <!-- Pilihan Tenor (Tombol Horizontal) -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Tenor (Bulan)</label>
+                        <div class="grid grid-cols-5 gap-2" id="tenorButtons">
+                            <!-- Buttons injected by JS -->
+                        </div>
+                        <input type="hidden" id="inputTenor" value="35">
+                    </div>
+
+                    <!-- Box Hasil (Total) -->
+                    <div class="bg-slate-850 rounded-xl p-5 mt-4 relative overflow-hidden shadow-inner">
+                        <!-- Background glow effect -->
+                        <div class="absolute -right-8 -top-8 w-32 h-32 bg-brand rounded-full blur-3xl opacity-20 pointer-events-none"></div>
+                        
+                        <div class="flex justify-between items-center mb-3 relative z-10">
+                            <span class="text-xs font-medium text-slate-300">Pokok Hutang</span>
+                            <span id="resHutang" class="text-sm font-bold text-white">Rp 0</span>
+                        </div>
+                        
+                        <div class="pt-3 border-t border-slate-700 flex flex-col items-start relative z-10">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Angsuran per Bulan</span>
+                            <span id="resAngsuran" class="text-2xl md:text-3xl font-extrabold text-white text-brand-light">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <!-- CTA WhatsApp -->
+                    <button id="btnKirimWa" class="w-full bg-brand hover:bg-brand-hover text-white font-bold py-4 rounded-xl shadow-lg shadow-red-200 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm flex items-center justify-center gap-2 mt-2">
+                        Kirim ke WhatsApp <i class="fa-brands fa-whatsapp text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Floating Action Button (Mobile Only / Optional for Desktop) -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end lg:hidden">
+        <a id="fabWA" href="#" target="_blank" class="bg-[#25D366] text-white w-14 h-14 rounded-full shadow-lg shadow-green-200/50 flex items-center justify-center hover:bg-green-600 transition-transform transform hover:scale-110 active:scale-95 text-3xl">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <!-- Javascript Logic -->
+    <script>
+        // 1. Data Dummy Kendaraan (Bisa diganti lewat admin nantinya)
+        const vehicles = [
+            { id: 1, name: "Honda BeAT CBS", price: 18430000, img: "https://placehold.co/400x300/f8fafc/cc0000?text=BeAT+CBS&font=montserrat" },
+            { id: 2, name: "Honda BeAT Deluxe", price: 19300000, img: "https://placehold.co/400x300/f8fafc/cc0000?text=BeAT+Deluxe&font=montserrat" },
+            { id: 3, name: "Honda Scoopy Fashion", price: 21975000, img: "https://placehold.co/400x300/f8fafc/cc0000?text=Scoopy&font=montserrat" },
+            { id: 4, name: "Honda PCX 160 CBS", price: 32670000, img: "https://placehold.co/400x300/f8fafc/cc0000?text=PCX+160&font=montserrat" },
+            { id: 5, name: "Honda Vario 125", price: 22550000, img: "https://placehold.co/400x300/f8fafc/cc0000?text=Vario+125&font=montserrat" },
+            { id: 6, name: "Honda ADV 160", price: 36200000, img: "https://placehold.co/400x300/f8fafc/cc0000?text=ADV+160&font=montserrat" }
+        ];
+
+        const tenors = [11, 17, 23, 29, 35];
+        const BUNGA_BULANAN = 0.016; // Asumsi 1.6% bunga flat per bulan
+        const NOMOR_WA = "6281234567890"; // Ganti dengan nomor Admin
+
+        // Elemen DOM
+        const elGrid = document.getElementById('catalogGrid');
+        const elSelect = document.getElementById('inputMotor');
+        const elOtr = document.getElementById('displayOtr');
+        const elDp = document.getElementById('inputDp');
+        const elTenorContainer = document.getElementById('tenorButtons');
+        const elTenorInput = document.getElementById('inputTenor');
+        
+        const resHutang = document.getElementById('resHutang');
+        const resAngsuran = document.getElementById('resAngsuran');
+        
+        const dpWarning = document.getElementById('dpWarning');
+        const minDpDisplay = document.getElementById('minDpDisplay');
+        const fabWA = document.getElementById('fabWA');
+        const btnKirimWa = document.getElementById('btnKirimWa');
+
+        // Utilities Format
+        const formatRp = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+        const parseRp = (str) => parseInt(str.replace(/[^0-9]/g, '')) || 0;
+        
+        const formatRupiahInput = (angka) => {
+            let number_string = angka.replace(/[^,\d]/g, '').toString(),
+                split = number_string.split(','),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+            if(ribuan){
+                let separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+            return rupiah;
+        };
+
+        // Inisialisasi Tampilan
+        const init = () => {
+            // Render Katalog
+            vehicles.forEach((v, idx) => {
+                // Card UI: Clean & Premium
+                const card = document.createElement('div');
+                card.className = "group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-red-900/5 hover:border-red-200 transition-all duration-300 transform hover:-translate-y-1 flex flex-col";
+                card.innerHTML = `
+                    <div class="relative overflow-hidden bg-gray-50 aspect-[4/3] flex items-center justify-center p-4">
+                        <img src="${v.img}" alt="${v.name}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="p-4 md:p-5 flex flex-col flex-1 border-t border-gray-100">
+                        <h3 class="text-sm md:text-base font-bold text-slate-800 leading-tight mb-1">${v.name}</h3>
+                        <p class="text-xs md:text-sm text-brand font-extrabold mb-4">${formatRp(v.price)}</p>
+                        <button onclick="pilihMotor(${idx})" class="mt-auto w-full bg-white text-brand border-2 border-brand hover:bg-brand hover:text-white transition-colors text-xs font-bold py-2 md:py-2.5 rounded-xl uppercase tracking-wider">
+                            Simulasi
+                        </button>
+                    </div>
+                `;
+                elGrid.appendChild(card);
+
+                // Option Dropdown
+                const option = document.createElement('option');
+                option.value = idx;
+                option.text = v.name;
+                elSelect.appendChild(option);
+            });
+
+            // Render Tenor Buttons
+            tenors.forEach(t => {
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = "tenor-btn w-full border-2 border-gray-200 text-slate-600 bg-white py-2 md:py-2.5 rounded-xl text-xs font-bold transition-all focus:outline-none hover:border-brand/50 hover:text-brand";
+                btn.innerText = t;
+                btn.onclick = () => setTenor(t, btn);
+                elTenorContainer.appendChild(btn);
+            });
+
+            // Set state awal
+            setTenor(35, elTenorContainer.lastChild); // Default 35 bln
+            setDefaultDp(0); // Set DP 10% untuk motor pertama
+            updateKalkulator();
+        };
+
+        // Fungsi klik "Simulasi" dari Katalog
+        window.pilihMotor = (idx) => {
+            elSelect.value = idx;
+            setDefaultDp(idx);
+            updateKalkulator();
+            
+            // Animasi scroll halus ke kalkulator (sangat berguna di Mobile)
+            const panel = document.getElementById('calculator-panel');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Efek highlight ring di dropdown
+            elSelect.classList.add('ring-4', 'ring-brand/30', 'border-brand');
+            setTimeout(() => elSelect.classList.remove('ring-4', 'ring-brand/30', 'border-brand'), 1000);
+        };
+
+        // Set Tenor Button State
+        const setTenor = (val, btnEl) => {
+            elTenorInput.value = val;
+            
+            // Reset semua tombol tenor
+            document.querySelectorAll('.tenor-btn').forEach(b => {
+                b.classList.remove('bg-brand', 'text-white', 'border-brand', 'shadow-md', 'shadow-red-200');
+                b.classList.add('bg-white', 'text-slate-600', 'border-gray-200');
+            });
+
+            // Aktifkan tombol terpilih
+            btnEl.classList.remove('bg-white', 'text-slate-600', 'border-gray-200');
+            btnEl.classList.add('bg-brand', 'text-white', 'border-brand', 'shadow-md', 'shadow-red-200');
+            
+            updateKalkulator();
+        };
+
+        // Set DP otomatis 10% saat ganti motor
+        const setDefaultDp = (idx) => {
+            const otr = vehicles[idx].price;
+            const minDp = Math.ceil((otr * 0.10) / 100000) * 100000; // Pembulatan ke ratusan ribu terdekat
+            elDp.value = formatRupiahInput(minDp.toString());
+        };
+
+        // Logika Utama Kalkulator
+        const updateKalkulator = () => {
+            const motor = vehicles[elSelect.value];
+            const otr = motor.price;
+            let dp = parseRp(elDp.value);
+            const tenor = parseInt(elTenorInput.value);
+
+            elOtr.innerText = formatRp(otr);
+            
+            const batasMinDp = otr * 0.10;
+            minDpDisplay.innerText = formatRp(batasMinDp);
+
+            // Validasi DP Minimal 10%
+            if (dp > 0 && dp < batasMinDp) {
+                dpWarning.classList.remove('hidden');
+                elDp.classList.add('border-red-400', 'bg-red-50');
+            } else {
+                dpWarning.classList.add('hidden');
+                elDp.classList.remove('border-red-400', 'bg-red-50');
+            }
+
+            // Mencegah minus jika input DP aneh
+            if(dp >= otr) dp = otr - 1000000; 
+
+            // Hitungan
+            const pokokHutang = otr - dp;
+            
+            // Bunga flat = pokok * persentase per bulan * jumlah bulan
+            const totalBunga = pokokHutang * BUNGA_BULANAN * tenor;
+            const totalHutang = pokokHutang + totalBunga;
+            
+            let angsuran = 0;
+            if (pokokHutang > 0 && dp >= batasMinDp) {
+                // Pembulatan cicilan ke atas per ribuan perak
+                angsuran = Math.ceil((totalHutang / tenor) / 1000) * 1000;
+            }
+
+            // Update DOM
+            resHutang.innerText = formatRp(pokokHutang > 0 ? pokokHutang : 0);
+            resAngsuran.innerText = formatRp(angsuran);
+
+            // Siapkan text WhatsApp
+            const textWa = `Halo Admin,\n\nSaya tertarik dengan penawaran kredit berikut:\n\n*Kendaraan:* ${motor.name}\n*Harga OTR:* ${formatRp(otr)}\n*Rencana DP:* ${formatRp(dp)}\n*Tenor:* ${tenor} Bulan\n*Estimasi Cicilan:* ${formatRp(angsuran)} / bulan\n\nMohon informasi persyaratannya. Terima kasih.`;
+            const waUrl = `https://wa.me/${NOMOR_WA}?text=${encodeURIComponent(textWa)}`;
+            
+            fabWA.href = waUrl;
+            btnKirimWa.onclick = () => window.open(waUrl, '_blank');
+        };
+
+        // Event Listeners
+        elSelect.addEventListener('change', (e) => {
+            setDefaultDp(e.target.value);
+            updateKalkulator();
+        });
+
+        elDp.addEventListener('input', function() {
+            this.value = formatRupiahInput(this.value);
+            updateKalkulator();
+        });
+
+        // Init App
+        window.onload = init;
+    </script>
+</body>
+</html>
